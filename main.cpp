@@ -22,6 +22,7 @@ int main(int argc, char *argv[]) {
 		do {
 			printf(inputNotice.c_str());
 			if (std::getline(cin, s).eof()) {
+				cout << endl;
 				return 0;
 			}
 		} while (s.empty() || s.compare(string(s.size(), ' ')) == 0);
