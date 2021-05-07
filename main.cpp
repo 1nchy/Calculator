@@ -21,7 +21,9 @@ int main(int argc, char *argv[]) {
 		unsigned outPos = 0;
 		do {
 			printf(inputNotice.c_str());
-			std::getline(cin, s);
+			if (std::getline(cin, s).eof()) {
+				return 0;
+			}
 		} while (s.empty() || s.compare(string(s.size(), ' ')) == 0);
 		// s 一定非空且非全空格
 		if (find(quitSet.cbegin(), quitSet.cend(), s) != quitSet.cend()) {
