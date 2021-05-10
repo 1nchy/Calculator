@@ -442,7 +442,6 @@ void Expression::clear() {
     flag = CORRECT;
     tinyErrorLocation = 0;
     accurate = false;
-    mark = sci = expre.cbegin();
     numList.clear();
     symList.clear();
     asgn = false;
@@ -460,4 +459,5 @@ void Expression::init(const string &s, const bool asgn, const bool asfx) {
     }
     this->asgn = asgn;
     this->setFunc = asfx;
+    mark = sci = expre.cbegin();
 }
