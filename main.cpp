@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 		bool asgn = false, asfx = false;
 		unsigned outPos = 0;
 		do {
-			printf(inputNotice.c_str());
+			printf("%s", inputNotice.c_str());
 			if (std::getline(cin, s).eof()) {
 				cout << endl;
 				return 0;
