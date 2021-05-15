@@ -51,6 +51,9 @@ unsigned Expression::next(string &s) {
         else if (c == INDEPENDENT_VARIABLE) {
             ++sci;
         }
+        if (sci != expre.cend() && isDigitBegin(*sci)) {
+            return OPERATOR_LOST;
+        }
     }
     else if (std::find_if(subst.cbegin(), subst.cend(), lambdaExp) != subst.cend()) {
         // 运算符块
@@ -61,6 +64,12 @@ unsigned Expression::next(string &s) {
                 // 处理双阶乘
                 if (sci != expre.cend() && *sci == '!') {
                     ++sci;
+                }
+            }
+            else if (c == '(') {
+                if (sci != expre.cend() && *sci == ')') {
+                    flag = OPERANDS_LOST;
+                    break;
                 }
             }
             string str(mark, sci);
