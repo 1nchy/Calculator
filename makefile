@@ -1,4 +1,4 @@
-CC = g++
+CC = g++ -std=c++11
 src = $(shell find ./ -name "*.cpp")
 obj = $(patsubst %.cpp,%.o,$(src))
 object = $(shell find ./ -name "*.o")
