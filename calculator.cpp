@@ -163,7 +163,7 @@ unsigned Expression::count(double x, char c , double y, double& r) {
 
         case 'A': if (x<y||y<0) return INVALID_INPUT; r=parttimes((int)x, std::min((int)(x-y),(int)y)); break;
         case 'C': if (x<y||y<0) return INVALID_INPUT; r=parttimes((int)x, std::min((int)(x-y),(int)y))/fac(std::min((int)(x-y),(int)y)); break;
-        case 'm': r = long(x) % long(y); break;
+        case '%': case 'm': if (y==0) return INVALID_INPUT; r = long(x) % long(y); break;
         case '!': if (!std::isnan(y)) return OPERATOR_LOST; if (x<0) return INVALID_INPUT; r = fac((int)x); break;
         case '?': if (!std::isnan(y)) return OPERATOR_LOST; if (x<0) return INVALID_INPUT; r = profac((int)x); break;
         default: return INVALID_SYNTAX;
@@ -193,7 +193,7 @@ unsigned Expression::compute() {
     while (flag == CORRECT) {
         flag = next(s);
         if (flag == POSI_NEGA) {
-            numList.push_back(zero);
+            numList.push_back(0);
             symList.push_back(subst.at(s));
             flag = CORRECT;
         }
@@ -274,6 +274,8 @@ unsigned getPriority(const char &s) {
             return 3;
         case '^':
             return 4;
+        case '%':
+            return 5;
         case 'l':
             return 6;
         case 's': case 'c': case 't': case 'o': case 'S': case 'D': case 'T': case 'O':

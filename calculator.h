@@ -40,7 +40,7 @@ const map<string, char> subst {
 	{string("("), '('}, {string(")"), ')'},
 	{string("+"), '+'}, {string("-"), '-'},
 	{string("*"), '*'}, {string("/"), '/'},
-	{string("^"), '^'},
+	{string("^"), '^'}, {string("%"), '%'},
 	{string("sin"), 's'}, {string("cos"), 'c'},
 	{string("tan"), 't'}, {string("cot"), 'o'},
 	{string("asin"), 'S'}, {string("acos"), 'D'},
