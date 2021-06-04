@@ -49,7 +49,7 @@ const map<string, char> subst {
 	{string("abs"), 'a'},
 	{string("!"), '!'}, {string("!!"), '?'},
 	{string("C"), 'C'}, {string("A"), 'A'},
-	{string("mod"), 'm'},
+	{string("mod"), 'm'}, {string("inv"), 'i'},
 	{string("pi"), 'p'}, {string("e"), 'e'}
 };
 // 一元运算符
@@ -99,8 +99,10 @@ public:
 
 unsigned getPriority(const char &s);
 
-double fac(int n);
-double profac(int n);
-double parttimes(int x, int y);
+double fac(unsigned int n);
+double profac(unsigned int n);
+double parttimes(unsigned int x, unsigned int y);
+double invMod(unsigned int a, unsigned int m);
+std::pair<unsigned int,unsigned int> extEuclid(unsigned int a, unsigned int b);
 
 #endif

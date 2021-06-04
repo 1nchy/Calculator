@@ -161,11 +161,12 @@ unsigned Expression::count(double x, char c , double y, double& r) {
 
         case 'a': if (!std::isnan(x)) return OPERATOR_LOST; r = std::abs(y); break;
 
-        case 'A': if (x<y||y<0) return INVALID_INPUT; r=parttimes((int)x, std::min((int)(x-y),(int)y)); break;
-        case 'C': if (x<y||y<0) return INVALID_INPUT; r=parttimes((int)x, std::min((int)(x-y),(int)y))/fac(std::min((int)(x-y),(int)y)); break;
+        case 'A': if (x<y||y<0) return INVALID_INPUT; r=parttimes((unsigned int)x, std::min((unsigned int)(x-y),(unsigned int)y)); break;
+        case 'C': if (x<y||y<0) return INVALID_INPUT; r=parttimes((unsigned int)x, std::min((unsigned int)(x-y),(unsigned int)y))/fac(std::min((unsigned int)(x-y),(unsigned int)y)); break;
         case '%': case 'm': if (y==0) return INVALID_INPUT; r = long(x) % long(y); break;
-        case '!': if (!std::isnan(y)) return OPERATOR_LOST; if (x<0) return INVALID_INPUT; r = fac((int)x); break;
-        case '?': if (!std::isnan(y)) return OPERATOR_LOST; if (x<0) return INVALID_INPUT; r = profac((int)x); break;
+        case 'i': if (x>=y||x<0) return INVALID_INPUT; r=invMod((unsigned int)x,(unsigned int)y); break;
+        case '!': if (!std::isnan(y)) return OPERATOR_LOST; if (x<0) return INVALID_INPUT; r = fac((unsigned int)x); break;
+        case '?': if (!std::isnan(y)) return OPERATOR_LOST; if (x<0) return INVALID_INPUT; r = profac((unsigned int)x); break;
         default: return INVALID_SYNTAX;
     }
     return CORRECT;
@@ -266,7 +267,7 @@ unsigned getPriority(const char &s) {
     switch (s) {
         case '(': case ')':
             return 0;
-        case 'm':
+        case 'm': case 'i':
             return 1;
         case '+': case '-': 
             return 2;
@@ -424,7 +425,7 @@ double Expression::getResult() {
     return result;
 }
 
-double fac(int n) {
+double fac(unsigned int n) {
     if (n <= 1) return 1;
     double r = 1;
     for (int i = 2; i <= n; ++i) {
@@ -432,7 +433,7 @@ double fac(int n) {
     }
     return r;
 }
-double profac(int n) {
+double profac(unsigned int n) {
     if (n<=1) return 1;
     double r = n;
     for (int i = n-2; i >= 2; i -= 2) {
@@ -440,12 +441,39 @@ double profac(int n) {
     }
     return r;
 }
-double parttimes(int x, int y) {
+double parttimes(unsigned int x, unsigned int y) {
     double r = 1;
     for (int i = x; i > x-y; --i) {
         r *= i;
     }
     return r;
+}
+double invMod(unsigned int a, unsigned int m) {
+    auto p = extEuclid(a,m);
+    if (p.second != 1) {
+        return 0;
+    }
+    else {
+        return (p.first+m)%m;
+    }
+}
+std::pair<unsigned int,unsigned int> extEuclid(unsigned int a, unsigned int b) {
+    unsigned int x = 1, y = 0, m = a, n = b;
+    if (b == 0) {
+        return std::make_pair(x,a);
+    }
+    unsigned int x1 = 0, x2 = 1, y1 = 1, y2 = 0;
+    while (n > 0) {
+        unsigned int q = m / n;
+        unsigned int r = m % n;
+        m = n;
+        n = r;
+        x = x2 - q * x1;
+        y = y2 - q * y1;
+        x2 = x1; x1 = x;
+        y2 = y1; y1 = y;
+    }
+    return std::make_pair(x2,m);
 }
 
 
