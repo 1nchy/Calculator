@@ -163,7 +163,8 @@ unsigned Expression::count(double x, char c , double y, double& r) {
 
         case 'A': if (x<y||y<0) return INVALID_INPUT; r=parttimes((unsigned int)x, std::min((unsigned int)(x-y),(unsigned int)y)); break;
         case 'C': if (x<y||y<0) return INVALID_INPUT; r=parttimes((unsigned int)x, std::min((unsigned int)(x-y),(unsigned int)y))/fac(std::min((unsigned int)(x-y),(unsigned int)y)); break;
-        case '%': case 'm': if (y==0) return INVALID_INPUT; r = long(x) % long(y); break;
+        case '%': if (y==0) return INVALID_INPUT; r = long(x) % long(y); break;
+        case 'm': if (y==0) return INVALID_INPUT; r = (long(x) % long(y) + long(y)) % long(y); break;
         case 'i': if (x>=y||x<0) return INVALID_INPUT; r=invMod((unsigned int)x,(unsigned int)y); break;
         case '!': if (!std::isnan(y)) return OPERATOR_LOST; if (x<0) return INVALID_INPUT; r = fac((unsigned int)x); break;
         case '?': if (!std::isnan(y)) return OPERATOR_LOST; if (x<0) return INVALID_INPUT; r = profac((unsigned int)x); break;
