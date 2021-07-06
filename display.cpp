@@ -43,3 +43,22 @@ void DisplayErrorMsg(Expression &e, unsigned outPos) {
 void DisplayOperators() {
     std::for_each(subst.cbegin(), subst.cend(), [](decltype(subst)::value_type vs){cout << vs.first << endl;});
 }
+
+void DisplayResult(const double &r, const string &base_str) {
+    if (base_str.empty()) {
+        cout << r << endl;
+        return;
+    }
+    int base = atoi(base_str.c_str());
+    // cout << "--" << base << endl;
+    if (0 >= base || base > 36) {
+        cout << r << " (10)\n" << "  :Base Not in Range" << endl;
+        return;
+    }
+    else if (base == 16) {
+        cout << std::hexfloat << r << " (16)" << std::dec << endl;
+    }
+    else {
+        cout << r << " (10)\n" << "  :Not Currently Supported" << endl;
+    }
+}

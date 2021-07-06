@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <set>
 
 #include "calculator.h"
@@ -13,10 +14,11 @@ using std::cout;
 using std::endl;
 
 const string welcomeMsg = "Calculator by 1nchy, enjoy yourself ~";
-const string versionMsg = "Version 3.2.5 on linux";
+const string versionMsg = "Version 3.2.6 on linux";
 const string inputNotice = ">>> ";
 const char asgnCmd = ':';
 const char funcCmd = '\\';
+const string baseTrans = "->";
 const set<string> echoSet {
     string("echo")
 };
@@ -29,5 +31,6 @@ const set<string> quitSet {
 
 void DisplayErrorMsg(Expression&, unsigned outPos);
 void DisplayOperators();
+void DisplayResult(const double &, const string &base_str);
 
 #endif

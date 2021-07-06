@@ -57,10 +57,19 @@ int main(int argc, char *argv[]) {
 			asfx = true;
 			// ep.func = function;
 		}
+
+		string base_str;
+		auto bpos = s.rfind(baseTrans);
+		if (bpos != string::npos) {
+			base_str = s.substr(bpos+2);
+			// cout << base_str << endl;
+			s.erase(bpos);
+		}
 		ep.init(s, asgn, asfx);
 		if (ep.compute() == CORRECT) {
 			if (!ep.accurate) {
-				cout << ep.getResult() << endl;
+				DisplayResult(ep.getResult(), base_str);
+				// cout << ep.getResult() << endl;
 			}
 			else {
 				printf("%.10lf\n", ep.result);

@@ -25,7 +25,7 @@
 #define UNKNOWN_ERROR 10
 #define POSI_NEGA 32		// 正负号
 
-#define INDEPENDENT_VARIABLE 'x'
+#define INDEPENDENT_VARIABLE '@'
 
 #define PI 3.141592653589793
 #define E 2.718281828459045
@@ -60,6 +60,11 @@ const set<string> unaryOperator {
 	string("abs"),
 	string("!"), string("!!")
 };
+// 进制转换表
+const map<string, short> baseTable {
+	{string("0b"), 2}, {string("0B"), 2},
+	{string("0x"), 16}, {string("0X"), 16}
+};
 const double zero = std::sqrt(-1);
 
 class Expression {
@@ -74,7 +79,7 @@ private:
 	unsigned tranStrToNum(const string&, double &r);
 	unsigned tinyErrorLocation;
 	inline bool isDigitBegin(const char &c);
-	inline bool isDigitEnd(const char &c);
+	inline bool isDigitEnd(const char &c, const short &base);
 	unsigned next(string &s);
 	// 判断当前运算符优先级是否比栈顶运算符优先级更高
 	bool isMorePrior(const char &s);
@@ -104,5 +109,7 @@ double profac(unsigned int n);
 double parttimes(unsigned int x, unsigned int y);
 double invMod(unsigned int a, unsigned int m);
 std::pair<unsigned int,unsigned int> extEuclid(unsigned int a, unsigned int b);
+bool is_digit(const char &c, const short &base);
+short get_digit(const char &c, const short &base);
 
 #endif

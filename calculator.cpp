@@ -12,19 +12,40 @@ unsigned Expression::next(string &s) {
     mark = sci;
     auto c = *sci;
     bool dotFlag = false;
+    static short base = 10;
     auto lambdaExp = [c](decltype(subst)::value_type im){return im.first[0] == c;};
     if (isDigitBegin(c)) {
         // 数字块
         flag = NUMBER;
+        base = 10;
+        if (c == '0') {
+            if (sci + 1 != expre.cend()) {
+                auto cnext = *(sci+1);
+                auto btir = std::find_if(baseTable.cbegin(), baseTable.cend(), [cnext](decltype(baseTable)::value_type bv)->bool{return bv.first[1] == cnext;});
+                if (btir != baseTable.cend()) {
+                    base = btir->second;
+                    sci += 2;
+                    if (sci == expre.cend()) {
+                        return INVALID_SYNTAX;
+                    }
+                    else {
+                        c = *sci;
+                        if (!is_digit(c, base)) {
+                            return INVALID_SYNTAX;
+                        }
+                    }
+                }
+            }
+        }
         while (1) {
-            // 读取普通数字 (0~9.)
-            if (!isdigit(c) && (c != '.' || dotFlag == true)) {
+            // 读取普通数字 /[0-9a-f\.]/
+            if (!is_digit(c, base) && (c != '.' || dotFlag == true)) {
                 break;
             }
             ++sci;
             if (c == '.') {
                 dotFlag = true;
-                if (sci == expre.cend() || !isdigit(*sci)) {
+                if (sci == expre.cend() || !is_digit(*sci, base)) {
                     tinyErrorLocation += sci - mark;
                     flag = INVALID_SYNTAX;
                     return flag;
@@ -96,7 +117,7 @@ unsigned Expression::next(string &s) {
                 auto tmp = mark - 1;
                 while (tmp != expre.cbegin() && *tmp == ' ') --tmp;
                 // printf ("Current tmp: %c\n", *tmp);
-                if ((tmp == expre.cbegin() && *tmp == ' ') || (!isDigitEnd(*tmp) && *tmp != ')' && *tmp != '!') ) {
+                if ((tmp == expre.cbegin() && *tmp == ' ') || (!isDigitEnd(*tmp, base) && *tmp != ')' && *tmp != '!') ) {
                     flag = POSI_NEGA;
                 }
             }
@@ -177,8 +198,8 @@ bool Expression::isDigitBegin(const char &c) {
     return (isdigit(c) || (c == 'p') || (c == 'e') || (c == INDEPENDENT_VARIABLE));
 }
 
-bool Expression::isDigitEnd(const char &c) {
-    return (isdigit(c) || (c == 'i') || (c == 'e') || (c == INDEPENDENT_VARIABLE));
+bool Expression::isDigitEnd(const char &c, const short &base) {
+    return (is_digit(c, base) || (c == 'i') || (c == 'e') || (c == INDEPENDENT_VARIABLE));
 }
 
 
@@ -352,6 +373,15 @@ unsigned Expression::tranStrToNum(const string &s, double &r) {
     double integral = 0, fractional = 0;
     auto ir = s.cbegin();
     auto c = *ir;
+    short base = 10;
+    if (s.length() >= 2) {
+        auto btir = std::find_if(baseTable.cbegin(), baseTable.cend(), [&s](decltype(baseTable)::value_type bt){return string(s.cbegin(), s.cbegin()+2) == bt.first;});
+        if (btir != baseTable.cend()) {
+            ir += 2;
+            c = *ir;
+            base = btir->second;
+        }
+    }
     if (c == 'p') {
         r = PI;
     }
@@ -369,11 +399,11 @@ unsigned Expression::tranStrToNum(const string &s, double &r) {
                 return NUMBER;
             }
             c = *ir;
-            if (!isdigit(c)) {
+            if (!is_digit(c, base)) {
                 break;
             }
             ++ir;
-            integral = integral * 10 + (c - (double)'0');
+            integral = integral * base + static_cast<double>(get_digit(c, base));
         }
         if (c == 'p') {
             r = integral * PI;
@@ -392,11 +422,11 @@ unsigned Expression::tranStrToNum(const string &s, double &r) {
                     return NUMBER;
                 }
                 c = *ir;
-                if (!isdigit(c)) {
+                if (!is_digit(c, base)) {
                     break;
                 }
                 ++ir;
-                fractional = fractional + (c - (double)'0') * std::pow(0.1, i);
+                fractional = fractional + static_cast<double>(get_digit(c, base)) * std::pow(1.0/base, i);
             }
             if (c == 'p') {
                 r = (integral + fractional) * PI;
@@ -476,7 +506,37 @@ std::pair<unsigned int,unsigned int> extEuclid(unsigned int a, unsigned int b) {
     }
     return std::make_pair(x2,m);
 }
-
+bool is_digit(const char &c, const short &base) {
+    if (base <= 0 || base > 36) {
+        return false;
+    }
+    else if (0 < base && base <= 10) {
+        return '0' <= c && c < '0'+base;
+    }
+    else {
+        return ('0' <= c && c <= '9') || ('a' <= c && c < 'a'+base-10) || ('A' <= c && c < 'A'+base-10);
+    }
+}
+short get_digit(const char &c, const short &base) {
+    if (base <= 0 || base > 36) {
+        return -1;
+    }
+    else if (0 < base && base <= 10 && '0' <= c && c < '0'+base) {
+        return c - '0';
+    }
+    else if ('0' <= c && c <= '9') {
+        return c - '0';
+    }
+    else if ('a' <= c && c < 'a'+base-10) {
+        return 10 + c - 'a';
+    }
+    else if ('A' <= c && c < 'A'+base-10) {
+        return 10 + c - 'A';
+    }
+    else {
+        return -1;
+    }
+}
 
 void Expression::clear() {
     flag = CORRECT;
