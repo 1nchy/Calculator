@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 	Expression ep;
 	string function;
 	vector<string> sVector;
-	vector<string>::reverse_iterator sVectorIter;
+	vector<string>::iterator sVectorIter;
 	string::iterator sIter;
 	while (1)
 	{
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 		char c;
 		bool asgn = false, asfx = false;
 		unsigned outPos = 0;
-		sVectorIter = sVector.rbegin();
+		sVectorIter = sVector.end();
 		sIter = s.begin();
 		do
 		{
@@ -44,10 +44,15 @@ int main(int argc, char *argv[]) {
 					printf("\b\b");
 					printf("  ");
 					printf("\b\b");
+					for (auto iter=sIter; iter != s.end(); iter++)
+					{
+						cout << *iter;
+					}
 					break;
 				}
 				// Ctrl+C or Ctrl+D
 				if (c == '\04'||c == '\03'){
+					system("/bin/stty cooked");
 					return 0;
 				}
 				// 方向键
@@ -60,30 +65,70 @@ int main(int argc, char *argv[]) {
 						printf("\b\b\b\b");
 						printf("    ");
 						printf("\b\b\b\b");
-						for (int i = 0; i < 100;i++){
-							printf("\b");
+						if(!s.empty()){
+							for (auto iter=sIter; iter != s.begin(); iter--){
+								printf("\b");
+							}
+							for (auto iter=s.begin(); iter != s.end(); iter++){
+								printf(" ");
+							}
+							for (auto iter=s.begin(); iter != s.end(); iter++){
+								printf("\b");
+							}
 						}
-						for (int i = 0; i < 100;i++){
-							printf(" ");
+						if(sVector.empty()){
+							cout << "No history!" << endl;
+						}else if(sVectorIter==sVector.begin()){
+							cout << *sVectorIter ;
+							s = *sVectorIter;
+							sIter = s.end();
+						}else{
+							--sVectorIter;
+							cout << *sVectorIter ;
+							s = *sVectorIter;
+							sIter = s.end();
 						}
-						for (int i = 0; i < 100;i++){
-							printf("\b");
+						continue;
+						// 处理下方向键
+					}else if(arrow == 'B'){
+						printf("\b\b\b\b");
+						printf("    ");
+						printf("\b\b\b\b");
+						if(!s.empty()){
+							for (auto iter=sIter; iter != s.begin(); iter--){
+								printf("\b");
+							}
+							for (auto iter=s.begin(); iter != s.end(); iter++){
+								printf(" ");
+							}
+							for (auto iter=s.begin(); iter != s.end(); iter++){
+								printf("\b");
+							}
 						}
-						if (sVectorIter != sVector.rend())
+						if(sVector.empty()){
+							cout << "No history!" << endl;
+						}
+						else if(sVectorIter==sVector.end()){
+							cout << "No more history!";
+						}
+						else if (sVectorIter == sVector.end() - 1)
 						{
-							cout << *sVectorIter << endl;
-							sVectorIter++;
-						}
-						else if (!sVector.empty())
-						{
-							cout << sVector.front();
+							cout << *sVectorIter ;
+							s = *sVectorIter;
+							sIter = s.end();
 						}
 						else
 						{
-							cout << "No history!" << endl;
+							++sVectorIter;
+							cout << *sVectorIter ;
+							s = *sVectorIter;
+							sIter = s.end();
 						}
+						continue;
+					}
 					// 处理左方向键
-					}else if (arrow=='D'){
+					else if (arrow == 'D')
+					{
 						printf("\b\b\b\b");
 						printf("    ");
 						printf("\b\b\b\b");
@@ -146,18 +191,21 @@ int main(int argc, char *argv[]) {
 				}
 				else
 				{
-					s.insert(sIter, c);
-					for (auto iter=sIter; iter != s.end(); iter++)
+					sIter=s.insert(sIter, c);
+					sIter++;
+					for (auto iter = sIter; iter != s.end(); iter++)
 						cout << *iter;
+					for (auto iter = sIter; iter != s.end(); iter++)
+						printf("\b");
 				}
 		}
-			system("stty cooked");
-			setbuf(stdin,NULL);
+			system("/bin/stty cooked");
 			cout << endl;
 		} while (s.empty() || s.compare(string(s.size(), ' ')) == 0);
 		sVector.push_back(s);
 		// s 一定非空且非全空格
 		if (find(quitSet.cbegin(), quitSet.cend(), s) != quitSet.cend()) {
+			system("/bin/stty cooked");
 			break;
 		}
 		else if (find(helpSet.cbegin(), helpSet.cend(), s) != helpSet.cend()) {
