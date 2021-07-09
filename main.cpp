@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 							}
 						}
 						if(sVector.empty()){
-							cout << "No history!" << endl;
+							cout << "" ;
 						}else if(sVectorIter==sVector.begin()){
 							cout << *sVectorIter ;
 							s = *sVectorIter;
@@ -106,10 +106,10 @@ int main(int argc, char *argv[]) {
 							}
 						}
 						if(sVector.empty()){
-							cout << "No history!" << endl;
+							cout << "" ;
 						}
 						else if(sVectorIter==sVector.end()){
-							cout << "No more history!";
+							cout << "No more history!??????";
 						}
 						else if (sVectorIter == sVector.end() - 1)
 						{
@@ -180,8 +180,12 @@ int main(int argc, char *argv[]) {
 							printf("\b");
 						}
 						printf("\b");
-						continue;
+					}else{
+						printf("\b\b");
+						printf("  ");
+						printf("\b\b");
 					}
+					continue;
 				}
 				// printf("%i", int(c));
 				// 一般输入情况
