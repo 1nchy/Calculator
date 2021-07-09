@@ -19,7 +19,7 @@ Support variable and function functions.
 
 ~~~
 Calculator by 1nchy, enjoy yourself ~
-Version 3.2.* on linux
+Version 3.2.1, [GCC 10.2.0] on linux
 >>> 1.2-0.1
 1.1
 >>> 0.0.1
@@ -84,7 +84,7 @@ Quit：
 
 ~~~
 Calculator by 1nchy, enjoy yourself ~
-Version 3.2.* on linux
+Version 3.2.1, [GCC 10.2.0] on linux
 >>> 1.2-0.1
 1.1
 >>> 0.0.1
