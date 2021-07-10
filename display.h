@@ -13,7 +13,7 @@ using std::set;
 using std::cout;
 using std::endl;
 
-const string inputNotice = ">>> ";
+const string inputNotice = ">>>";
 const set<string> echoSet {
     string("echo")
 };

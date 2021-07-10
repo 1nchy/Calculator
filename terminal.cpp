@@ -11,10 +11,10 @@ void terminal::ctrlh(int n) const {
 
 string terminal::wait(const string& _notice) {
 	if (_notice.empty()) {
-		printf("%s", this->notice.c_str());
+		printf("%s ", this->notice.c_str());
 	}
 	else {
-		printf("%s", _notice.c_str());
+		printf("%s ", _notice.c_str());
 	}
     string s;
 	int c;

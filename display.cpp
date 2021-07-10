@@ -5,7 +5,7 @@ void DisplayErrorMsg(Expression &e, unsigned outPos) {
     switch (dem.first) {
     case INVALID_SYNTAX:
         if (e.subfx.empty()) {
-            cout << string(inputNotice.size()+dem.second+outPos, ' ') << '^' << endl;
+            cout << string(inputNotice.size()+1+dem.second+outPos, ' ') << '^' << endl;
         }
         else {
             auto ir = find_if(e.subfx.cbegin(), e.subfx.cend(), [dem](decltype(e.subfx)::value_type fuck){return dem.second < fuck;});
