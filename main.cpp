@@ -11,7 +11,16 @@ using std::endl;
 using std::find;
 
 const string welcomeMsg = "Calculator by 0nchy, enjoy yourself ~";
-const string versionMsg = "Version 3.2.7 on linux";
+const string versionMsg = "Version 3.2.8 on linux";
+
+inline void backspace(int n) {
+    for (int i = 0; i < n; ++i) printf("\b");
+}
+inline void ctrlh(int n) {
+    backspace(n);
+    printf("%*s", n, "");
+    backspace(n);
+}
 
 int main(int argc, char *argv[]) {
 	cout << welcomeMsg << endl;
@@ -20,176 +29,178 @@ int main(int argc, char *argv[]) {
 	string function;
 	vector<string> history;
 	vector<string>::const_iterator cur;
+	vector<char> front;
+	vector<char> behind;
 	while (1) {
 		printf("%s", inputNotice.c_str());
 		bool asgn = false, asfx = false;
 		unsigned outPos = 0;
 		string s;
 		int c;
-		string::const_iterator cursor = s.cbegin();
 		cur = history.cend();
-		system("stty raw");
-		while ((c = getchar()) != EOF) {
-			if (c == '\r' || c == '\n') {
-				printf("\b\b");
-				printf("  ");
-				printf("\b\b");
-				if (s.empty() || s.compare(string(s.size(), ' ')) == 0) {
-					continue;
-				}
-				for (auto iter = cursor; iter != s.cend(); ++iter) {
-					printf("%c", *iter);
-				}
-				system("/bin/stty cooked");
-				cout << endl;
-				history.push_back(s);
-				break;
-			}
-			// ctrl+c or ctrl+d
+        front.clear();
+        behind.clear();
+        system("stty raw");
+        while ((c = getchar()) != EOF) {
+            if (c == '\r' || c == '\n') {
+                ctrlh(2);
+                if (front.empty() && behind.empty()) {
+                    continue;
+                }
+                s = string(front.cbegin(), front.cend()) + string(behind.crbegin(), behind.crend());
+                if (s.empty() || s.compare(string(s.size(), ' ')) == 0) {
+                    continue;
+                }
+                std::for_each(behind.crbegin(), behind.crend(), [](char ch){printf("%c", ch);});
+                system("stty cooked");
+                cout << endl;
+                history.push_back(s);
+                break;
+            }
+            // ctrl+c or ctrl+d
 			else if (c == '\04' || c == '\03') {
                 system("/bin/stty cooked");
 				cout << endl;
 				return 0;
 			}
-			else if (c == '\033') {
-				getchar();
+            // combined key
+            else if (c == '\033') { // c == '^['
+				getchar(); // read a '['
 				int arrow = getchar();
-				printf("\b\b\b\b");
-				printf("    ");
-				printf("\b\b\b\b");
-				if (arrow == 'A') {
-					if (!s.empty()) {
-						for (auto iter = cursor; iter != s.cbegin(); --iter) {
-							printf("\b");
-						}
-                        for (auto iter = s.cbegin(); iter != s.cend(); ++iter) {
-                            printf(" ");
-                        }
-						// printf("%s", string(s.size(), ' ').c_str());
-						for (auto iter = s.cbegin(); iter != s.cend(); ++iter) {
-							printf("\b");
-						}
-					}
-					if (history.empty()) {
-						s.clear();
-						cursor = s.cbegin();
-					}
-					else if (cur == history.cbegin()) {
-						cout << *cur;
-						s = *cur;
-						cursor = s.cend();
-					}
-					else {
-						--cur;
-						cout << *cur;
-						s = *cur;
-						cursor = s.cend();
-					}
-				}
-				else if (arrow == 'B') {
-					if (!s.empty()) {
-						for (auto iter = cursor; iter != s.cbegin(); --iter) {
-							printf("\b");
-						}
-                        for (auto iter = s.cbegin(); iter != s.cend(); ++iter) {
-                            printf(" ");
-                        }
-						// printf("%s", string(s.size(), ' ').c_str());
-						for (auto iter = s.cbegin(); iter != s.cend(); ++iter) {
-							printf("\b");
-						}
-					}
-					if (history.empty()) {
-						s.clear();
-						cursor = s.cbegin();
-					}
-					else if (cur == history.cend()) {
-						s.clear();
-						cursor = s.cbegin();
-					}
-					else if (cur == history.cend() - 1) {
-						s.clear();
-						cursor = s.cbegin();
-					}
-					else {
-						++cur;
-						cout << *cur;
-						s = *cur;
-						cursor = s.cend();
-					}
-				}
-				else if (arrow == 'D') {
-					// printf("\b");
-					for (auto iter = cursor; iter != s.cend(); ++iter) {
-						printf("%c", *iter);
-					}
-					for (auto iter = cursor; iter != s.cend(); ++iter) {
-						printf("\b");
-					}
-					if (cursor != s.cbegin()) {
-						--cursor;
-						printf("\b");
-					}
-					// for (auto iter = cursor; iter != s.cend(); ++iter) {
-					//     printf("%c", *iter);
-					// }
-				}
-				else if (arrow == 'C') {
-					if (cursor != s.cend()) {
-						for (auto iter = cursor; iter != s.cend(); ++iter) {
-							printf("%c", *iter);
-						}
-						++cursor;
-						for (auto iter = cursor; iter != s.cend(); ++iter) {
-							printf("\b");
-						}
-					}
-				}
-			}
-			// backspace
-			else if (c == 127) {
-				if (cursor != s.cbegin()) {
-					printf("\b\b\b");
-					printf("   ");
-					printf("\b\b\b");
-					cursor = s.erase(--cursor);
-					for (auto iter = cursor; iter != s.cend(); ++iter) {
-						printf("%c", *iter);
-					}
-					printf(" ");
-					for (auto iter = cursor; iter != s.cend(); ++iter) {
-						printf("\b");
-					}
-					printf("\b");
-				}
-				else {
-					printf("\b\b");
-					printf("  ");
-					printf("\b\b");
-				}
-			}
-			else {
-				cursor = s.insert(cursor, c);
-				++cursor;
-				for (auto iter = cursor; iter != s.cend(); ++iter) {
-					printf("%c", *iter);
-				}
-				for (auto iter = cursor; iter != s.cend(); ++iter) {
-					printf("\b");
-				}
-			}
-		}
-		if (c == EOF) {
-			cout << endl;
-			break;
-		}
-		system("/bin/stty cooked");
-		// do {
-		// 	if (std::getline(cin, s).eof()) {
-		// 		cout << endl;
-		// 		return 0;
-		// 	}
-		// } while (s.empty() || s.compare(string(s.size(), ' ')) == 0);
+                // up arrow "^[[A"
+                if (arrow == 'A') {
+                    ctrlh(4);
+                    backspace(front.size());
+                    printf("%*s", front.size() + behind.size(), "");
+                    backspace(front.size() + behind.size());
+                    if (history.empty()) {
+                        front.clear();
+                        behind.clear();
+                    }
+                    else if (cur == history.cbegin()) {
+                        cout << *cur;
+                        front.clear();
+                        front.assign(cur->cbegin(), cur->cend());
+                        behind.clear();
+                    }
+                    else {
+                        --cur;
+                        cout << *cur;
+                        front.clear();
+                        front.assign(cur->cbegin(), cur->cend());
+                        behind.clear();
+                    }
+                }
+                // down arrow
+                else if (arrow == 'B') {
+                    ctrlh(4);
+                    backspace(front.size());
+                    printf("%*s", front.size() + behind.size(), "");
+                    backspace(front.size() + behind.size());
+                    if (history.empty()) {
+                        front.clear();
+                        behind.clear();
+                    }
+                    else if (cur == history.cend()) {
+                        front.clear();
+                        behind.clear();
+                    }
+                    else if (cur == history.cend() - 1) {
+                        front.clear();
+                        behind.clear();
+                    }
+                    else {
+                        ++cur;
+                        cout << *cur;
+                        front.clear();
+                        front.assign(cur->cbegin(), cur->cend());
+                        behind.clear();
+                    }
+                }
+                // left arrow
+                else if (arrow == 'D') {
+                    ctrlh(4);
+                    std::for_each(behind.crbegin(), behind.crend(), [](char ch){printf("%c", ch);});
+                    backspace(behind.size());
+                    if (!front.empty()) {
+                        behind.push_back(front.back());
+                        front.pop_back();
+                        printf("\b");
+                    }
+                }
+                // right arrow
+                else if (arrow == 'C') {
+                    ctrlh(4);
+                    if (!behind.empty()) {
+                        std::for_each(behind.crbegin(), behind.crend(), [](char ch){printf("%c", ch);});
+                        front.push_back(behind.back());
+                        behind.pop_back();
+                        backspace(behind.size());
+                    }
+                }
+                // home key "^[[H"
+                else if (arrow == 'H') {
+                    ctrlh(4);
+                    std::for_each(behind.crbegin(), behind.crend(), [](char ch){printf("%c", ch);});
+                    behind.insert(behind.end(), front.crbegin(), front.crend());
+                    front.clear();
+                    backspace(behind.size());
+                }
+                // end key "^[[F"
+                else if (arrow == 'F') {
+                    ctrlh(4);
+                    std::for_each(behind.crbegin(), behind.crend(), [](char ch){printf("%c", ch);});
+                    front.insert(front.end(), behind.crbegin(), behind.crend());
+                    behind.clear();
+                }
+                // delete key "^[[3~"
+                else if (arrow == '3') {
+                    getchar(); // read a '~'
+                    if (!behind.empty()) {
+                        ctrlh(5);
+                        behind.pop_back();
+                        std::for_each(behind.crbegin(), behind.crend(), [](char ch){printf("%c", ch);});
+                        printf(" ");
+                        backspace(behind.size() + 1);
+                    }
+                    else {
+                        ctrlh(5);
+                    }
+                }
+            }
+            // backspace
+            else if (c == 127) {
+                if (!front.empty()) {
+                    ctrlh(3);
+                    front.pop_back();
+                    std::for_each(behind.crbegin(), behind.crend(), [](char ch){printf("%c", ch);});
+                    printf(" ");
+                    backspace(behind.size() + 1);
+                }
+                else {
+                    ctrlh(2);
+                }
+            }
+            else {
+                // prohibit typing spaces at the beginning
+                if (c == ' ' && front.empty()) {
+                    printf("\b");
+                    if (!behind.empty()) {
+                        printf("%c", behind.back());
+                        printf("\b");
+                    }
+                    continue;
+                }
+                front.push_back(c);
+                std::for_each(behind.crbegin(), behind.crend(), [](char ch){printf("%c", ch);});
+                backspace(behind.size());
+            }
+        }
+        if (c == EOF) {
+            cout << endl;
+            break;
+        }
+        system("stty cooked");
 		// s 一定非空且非全空格
 		if (find(quitSet.cbegin(), quitSet.cend(), s) != quitSet.cend()) {
 			break;
