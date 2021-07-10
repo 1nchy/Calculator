@@ -67,6 +67,10 @@ const map<string, short> baseTable {
 };
 const double zero = std::sqrt(-1);
 
+const char asgnCmd = ':';
+const char funcCmd = '\\';
+const string baseTrans = "->";
+
 class Expression {
 private:
 	list<double> numList;

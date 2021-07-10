@@ -14,9 +14,6 @@ using std::cout;
 using std::endl;
 
 const string inputNotice = ">>> ";
-const char asgnCmd = ':';
-const char funcCmd = '\\';
-const string baseTrans = "->";
 const set<string> echoSet {
     string("echo")
 };

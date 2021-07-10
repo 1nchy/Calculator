@@ -9,6 +9,8 @@ calculator.o: calculator.cpp calculator.h
 	$(CC) -c calculator.cpp
 display.o: display.cpp display.h calculator.h
 	$(CC) -c display.cpp
+terminal.o: terminal.cpp terminal.h
+	$(CC) -c terminal.cpp
 main.o: main.cpp display.h calculator.h
 	$(CC) -c main.cpp
 debug:
