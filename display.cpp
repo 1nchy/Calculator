@@ -56,7 +56,7 @@ void DisplayResult(const double &r, const string &base_str) {
         return;
     }
     else if (base == 16) {
-        cout << std::hexfloat << r << " (16)" << std::dec << endl;
+        cout << std::hexfloat << r << " (16)" << std::defaultfloat << endl;
     }
     else {
         cout << r << " (10)\n" << "  :Not Currently Supported" << endl;
