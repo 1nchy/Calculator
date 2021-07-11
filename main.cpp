@@ -11,7 +11,7 @@ using std::endl;
 
 using std::find;
 
-const string welcomeMsg = "Calculator by 0nchy, enjoy yourself ~";
+const string welcomeMsg = "Calculator by 1nchy, enjoy yourself ~";
 const string versionMsg = "Version 3.2.9 on linux";
 // const string inputNotice = ">>>";
 
