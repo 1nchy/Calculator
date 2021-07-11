@@ -89,6 +89,7 @@ string terminal::wait(const string& _notice) {
 					behind.clear();
 				}
 				else if (cur == history.cend() - 1) {
+					++cur;
 					front.clear();
 					behind.clear();
 				}
