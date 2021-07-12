@@ -51,14 +51,36 @@ void DisplayResult(const double &r, const string &base_str) {
     }
     int base = atoi(base_str.c_str());
     // cout << "--" << base << endl;
-    if (0 >= base || base > 36) {
+    if (2 > base || base > 36) {
         cout << r << " (10)\n" << "  :Base Not in Range" << endl;
-        return;
-    }
-    else if (base == 16) {
-        cout << std::hexfloat << r << " (16)" << std::defaultfloat << endl;
     }
     else {
-        cout << r << " (10)\n" << "  :Not Currently Supported" << endl;
+        cout << convert(r, base) << " (" << base << ")" << endl;
     }
+}
+
+string convert(double d, short base) {
+    string s = "";
+    if (2 > base || base > 36) return s;
+    bool posi = d >= 0;
+    d = std::abs(d);
+    do {
+        int q = static_cast<int>(d/base);
+        int r = static_cast<int>(d - q * base);
+        d += q - static_cast<int>(d);
+        char pb = r < 10 ? '0'+r : 'a'+r-10;
+        s.insert(s.begin(), pb);
+    } while (d >= 1);
+    if (std::abs(d) > __FLT_EPSILON__) {
+        // cout << "d = " << d << endl;
+        s += '.';
+    }
+    while (std::abs(d) > __FLT_EPSILON__) {
+        int q = static_cast<int>(d * base);
+        d = d * base - q;
+        char pb = q < 10 ? '0'+q : 'a'+q-10;
+        s.insert(s.end(), pb);
+    }
+    if (!posi) s.insert(s.begin(), '-');
+    return s;
 }

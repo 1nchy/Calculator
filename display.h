@@ -28,4 +28,6 @@ void DisplayErrorMsg(Expression&, unsigned outPos);
 void DisplayOperators();
 void DisplayResult(const double &, const string &base_str);
 
+string convert(double, short);
+
 #endif
