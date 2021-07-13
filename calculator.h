@@ -31,6 +31,8 @@
 #define PI 3.141592653589793
 #define E 2.718281828459045
 
+#define FRAC_SIZE 50
+
 using std::string;
 using std::vector;
 using std::map;
@@ -72,6 +74,8 @@ const char asgnCmd = ':';
 const char funcCmd = '\\';
 const string baseTrans = "->";
 const char independent_var = 'x';
+
+// const int frac_size = 50;
 
 class Expression {
 private:

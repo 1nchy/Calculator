@@ -500,7 +500,7 @@ string Expression::to_string(short base) {
         return s;
     }
     else {
-        oss << convert(getResult(), base, 100) << " (" << base << ")";
+        oss << convert(getResult(), base, FRAC_SIZE) << " (" << base << ")";
         return oss.str();
     }
 }
@@ -518,7 +518,7 @@ string Expression::to_string(const string& base_str) {
         return oss.str();
     }
     else {
-        oss << convert(getResult(), base, 100) << " (" << base << ")";
+        oss << convert(getResult(), base, FRAC_SIZE) << " (" << base << ")";
         return oss.str();
     }
 }
