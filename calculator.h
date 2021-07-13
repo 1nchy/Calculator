@@ -125,7 +125,7 @@ double invMod(unsigned int a, unsigned int m);
 std::pair<unsigned int,unsigned int> extEuclid(unsigned int a, unsigned int b);
 bool is_digit(const char &c, const short &base);
 short get_digit(const char &c, const short &base);
-string convert(double, short);
+string convert(double, short, int = -1);
 
 template<typename... Args> string string_format(const string& format, Args... args);
 

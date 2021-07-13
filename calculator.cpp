@@ -500,7 +500,7 @@ string Expression::to_string(short base) {
         return s;
     }
     else {
-        oss << convert(getResult(), base) << " (" << base << ")";
+        oss << convert(getResult(), base, 100) << " (" << base << ")";
         return oss.str();
     }
 }
@@ -518,7 +518,7 @@ string Expression::to_string(const string& base_str) {
         return oss.str();
     }
     else {
-        oss << convert(getResult(), base) << " (" << base << ")";
+        oss << convert(getResult(), base, 100) << " (" << base << ")";
         return oss.str();
     }
 }
@@ -630,7 +630,7 @@ void Expression::init(const string &s, const bool asgn, const bool asfx) {
     mark = sci = expre.cbegin();
 }
 
-string convert(double d, short base) {
+string convert(double d, short base, int frac_size) {
     string s = "";
     if (2 > base || base > 36) return s;
     bool posi = d >= 0;
@@ -642,11 +642,11 @@ string convert(double d, short base) {
         char pb = r < 10 ? '0'+r : 'a'+r-10;
         s.insert(s.begin(), pb);
     } while (d >= 1);
-    if (std::abs(d) > __FLT_EPSILON__) {
+    if (std::abs(d) > __FLT_EPSILON__ && frac_size) {
         // cout << "d = " << d << endl;
         s += '.';
     }
-    while (std::abs(d) > __FLT_EPSILON__) {
+    for (int i = 0; std::abs(d) > __FLT_EPSILON__ && (frac_size >= 0 ? i < frac_size : 1); ++i) {
         int q = static_cast<int>(d * base);
         d = d * base - q;
         char pb = q < 10 ? '0'+q : 'a'+q-10;
