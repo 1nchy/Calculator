@@ -12,7 +12,7 @@ using std::endl;
 using std::find;
 
 const string welcomeMsg = "Calculator by 1nchy, enjoy yourself ~";
-const string versionMsg = "Version 3.3.1 on linux";
+const string versionMsg = "Version 3.3.2 on linux";
 // const string inputNotice = ">>>";
 
 int main(int argc, char *argv[]) {
