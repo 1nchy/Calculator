@@ -1,19 +1,42 @@
-CC = g++ -std=c++11
-src = $(shell find ./ -name "*.cpp")
-obj = $(patsubst %.cpp,%.o,$(src))
-object = $(shell find ./ -name "*.o")
+DIR=$(shell pwd)
+DIR=.
+BIN_DIR=$(DIR)/bin
+LIB_DIR=$(DIR)/lib
+SRC_DIR=$(DIR)/src
+INCLUDE_DIR=$(DIR)/include
+DEPS_DIR=$(DIR)/deps
+OBJ_DIR=$(DIR)/obj
+PROGRAM=$(DIR)/calculator
 
-calculator: $(obj)
-	$(CC) -o calculator $(obj)
-calculator.o: calculator.cpp calculator.h
-	$(CC) -c calculator.cpp
-display.o: display.cpp display.h calculator.h
-	$(CC) -c display.cpp
-terminal.o: terminal.cpp terminal.h
-	$(CC) -c terminal.cpp
-main.o: main.cpp display.h calculator.h
-	$(CC) -c main.cpp
-debug:
-	$(CC) -g $(src)
+## obj file path
+EXTENSION=cpp
+SRCS=$(wildcard $(SRC_DIR)/*.$(EXTENSION))
+OBJS=$(patsubst $(SRC_DIR)/%.$(EXTENSION), $(OBJ_DIR)/%.o, $(SRCS))
+DEPS=$(patsubst $(SRC_DIR)/%.$(EXTENSION), $(DEPS_DIR)/%.d, $(SRCS))
+
+## include file path
+INCLUDE=\
+		-I$(INCLUDE_DIR)
+
+## compile option
+CC=g++
+CFLAGS=-std=c++11
+
+## compile target
+.PHONY: all clean rebuild
+
+all:$(OBJS)
+	$(CC) $(CFLAGS) -o $(PROGRAM) $(OBJS)
+
+$(DEPS_DIR)/%.d: $(SRC_DIR)/%.$(EXTENSION)
+	$(CC) $(CFLAGS) -MM $^ | sed 's,^,$@ $(OBJ_DIR)/,' > $@
+
+include $(DEPS)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.$(EXTENSION)
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+rebuild: clean all
+
 clean:
-	rm $(object)
+	rm -rf $(OBJS) $(DEPS)
