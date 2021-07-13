@@ -12,7 +12,7 @@ using std::endl;
 using std::find;
 
 const string welcomeMsg = "Calculator by 1nchy, enjoy yourself ~";
-const string versionMsg = "Version 3.3.0 on linux";
+const string versionMsg = "Version 3.3.1 on linux";
 // const string inputNotice = ">>>";
 
 int main(int argc, char *argv[]) {
@@ -38,13 +38,13 @@ int main(int argc, char *argv[]) {
 			continue;
 		}
 		else if (find(echoSet.cbegin(), echoSet.cend(), s) != echoSet.cend()) {
-			cout << " x = " << ep.x << endl << "fx = " << ep.fx << endl;
+			cout << " x = " << ep.getx() << endl << "fx = " << ep.getfx() << endl;
 			continue;
 		}
 		else if (s.at(0) == asgnCmd) {
 			s = s.erase(0, 1);
 			if (s.empty()) {
-				ep.x = 0;
+				ep.xzero();
 				continue;
 			}
 			outPos = 1;
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 		else if (s.at(0) == funcCmd) {
 			function = s.erase(0, 1);
 			if (s.empty()) {
-				ep.fx = "";
+				ep.fxzero();
 				continue;
 			}
 			outPos = 1;
@@ -70,16 +70,15 @@ int main(int argc, char *argv[]) {
 		}
 		ep.init(s, asgn, asfx);
 		if (ep.compute() == CORRECT) {
-			if (!ep.accurate) {
-				DisplayResult(ep.getResult(), base_str);
-				// cout << ep.getResult() << endl;
+			if (!ep.accurate()) {
+				cout << ep.to_string(base_str) << endl;
 			}
 			else {
-				printf("%.10lf\n", ep.result);
+				cout << ep.to_string(1) << endl;
 			}
 		}
 		else {
-			DisplayErrorMsg(ep, outPos);
+			DisplayErrorMsg(ep.getErrorInfo(), outPos);
 		}
 	}
 	return 0;

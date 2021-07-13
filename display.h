@@ -24,9 +24,8 @@ const set<string> quitSet {
     string("quit"), string("q"), string("Q")
 };
 
-void DisplayErrorMsg(Expression&, unsigned outPos);
+void DisplayErrorMsg(const std::pair<unsigned, unsigned>&, unsigned outPos);
 void DisplayOperators();
-void DisplayResult(const double &, const string &base_str);
 
 string convert(double, short);
 

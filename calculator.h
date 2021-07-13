@@ -2,6 +2,7 @@
 #define _CALCULATOR_H_
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <map>
@@ -25,7 +26,7 @@
 #define UNKNOWN_ERROR 10
 #define POSI_NEGA 32		// 正负号
 
-#define INDEPENDENT_VARIABLE 'x'
+// #define INDEPENDENT_VARIABLE 'x'
 
 #define PI 3.141592653589793
 #define E 2.718281828459045
@@ -70,42 +71,51 @@ const double zero = std::sqrt(-1);
 const char asgnCmd = ':';
 const char funcCmd = '\\';
 const string baseTrans = "->";
+const char independent_var = 'x';
 
 class Expression {
 private:
 	list<double> numList;
 	list<char> symList;
 	string::const_iterator sci, mark;
+	bool _accurate;
+	string expre;
+	bool asgn = false;
+	bool setFunc = false;
+	double x = 0;
+	string fx = "";
+	double result = 0;
+	bool computed;
+	vector<size_t> subfx;
+	unsigned flag;
+
+	void clear();
 	unsigned once();
 	unsigned count(double, char, double, double&);
 	unsigned dealWithOperator(const string&);
 	unsigned dealWithNumber(const string&);
-	unsigned tranStrToNum(const string&, double &r);
 	unsigned tinyErrorLocation;
 	inline bool isDigitBegin(const char &c);
 	inline bool isDigitEnd(const char &c, const short &base);
 	unsigned next(string &s);
 	// 判断当前运算符优先级是否比栈顶运算符优先级更高
 	bool isMorePrior(const char &s);
-	bool setFunc = false;
-	void clear();
 public:
 	Expression() {};
 	void init(const string &s, const bool asgn, const bool asfx);
-	string expre;
-	string fx = "";
 	unsigned compute();
-	unsigned flag;
-	bool accurate;
-	bool asgn = false;
-	double result = 0;
-	double x = 0;
-	vector<size_t> subfx;
+	bool accurate() const;
 	std::pair<unsigned, unsigned> getErrorInfo();
+	double getx() const;
+	void xzero();
+	string getfx() const;
+	void fxzero();
 	double getResult();
-	
+	string to_string(short = 0);
+	string to_string(const string& = "");
 };
 
+unsigned tranStrToNum(const string&, double &r, double x);
 unsigned getPriority(const char &s);
 
 double fac(unsigned int n);
@@ -115,5 +125,8 @@ double invMod(unsigned int a, unsigned int m);
 std::pair<unsigned int,unsigned int> extEuclid(unsigned int a, unsigned int b);
 bool is_digit(const char &c, const short &base);
 short get_digit(const char &c, const short &base);
+string convert(double, short);
+
+template<typename... Args> string string_format(const string& format, Args... args);
 
 #endif

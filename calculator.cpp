@@ -5,7 +5,7 @@ unsigned Expression::next(string &s) {
     while (sci != expre.cend() && *sci == ' ') ++sci;
     if (sci == expre.cend() || *sci == '=') {
         if (*sci == '=') {
-            accurate = true;
+            _accurate = true;
         }
         return END_LINE;
     }
@@ -69,7 +69,7 @@ unsigned Expression::next(string &s) {
             }
             ++sci;
         }
-        else if (c == INDEPENDENT_VARIABLE) {
+        else if (c == independent_var) {
             ++sci;
         }
         if (sci != expre.cend() && isDigitBegin(*sci)) {
@@ -195,23 +195,27 @@ unsigned Expression::count(double x, char c , double y, double& r) {
 }
 
 bool Expression::isDigitBegin(const char &c) {
-    return (isdigit(c) || (c == 'p') || (c == 'e') || (c == INDEPENDENT_VARIABLE));
+    return (isdigit(c) || (c == 'p') || (c == 'e') || (c == independent_var));
 }
 
 bool Expression::isDigitEnd(const char &c, const short &base) {
-    return (is_digit(c, base) || (c == 'i') || (c == 'e') || (c == INDEPENDENT_VARIABLE));
+    return (is_digit(c, base) || (c == 'i') || (c == 'e') || (c == independent_var));
 }
 
 
 
 unsigned Expression::compute() {
+    if (computed) {
+        return flag;
+    }
     string s;
     double r;
     auto tmpSetFunc = this->setFunc;
     auto tmpAsgn = this->asgn;
     this->setFunc = false;
     this->asgn = false;
-    // clear();
+    this->computed = true;
+
     // 运算符和运算数入栈
     while (flag == CORRECT) {
         flag = next(s);
@@ -360,7 +364,7 @@ unsigned Expression::dealWithOperator(const string &s) {
 
 unsigned Expression::dealWithNumber(const string &s) {
     double r;
-    if (tranStrToNum(s, r) == NUMBER) {
+    if (tranStrToNum(s, r, x) == NUMBER) {
         numList.push_back(r);
         return CORRECT;
     }
@@ -369,7 +373,7 @@ unsigned Expression::dealWithNumber(const string &s) {
     }
 }
 
-unsigned Expression::tranStrToNum(const string &s, double &r) {
+unsigned tranStrToNum(const string &s, double &r, double x) {
     double integral = 0, fractional = 0;
     auto ir = s.cbegin();
     auto c = *ir;
@@ -388,7 +392,7 @@ unsigned Expression::tranStrToNum(const string &s, double &r) {
     else if (c == 'e') {
         r = E;
     }
-    else if (c == INDEPENDENT_VARIABLE) {
+    else if (c == independent_var) {
         r = x;
     }
     else {
@@ -411,7 +415,7 @@ unsigned Expression::tranStrToNum(const string &s, double &r) {
         else if (c == 'e') {
             r = integral * E;
         }
-        else if (c == INDEPENDENT_VARIABLE) {
+        else if (c == independent_var) {
             r = integral * x;
         }
         else {
@@ -434,7 +438,7 @@ unsigned Expression::tranStrToNum(const string &s, double &r) {
             else if (c == 'e') {
                 r = (integral + fractional) * E;
             }
-            else if (c == INDEPENDENT_VARIABLE) {
+            else if (c == independent_var) {
                 r = (integral + fractional) * x;
             }
             else {
@@ -446,14 +450,77 @@ unsigned Expression::tranStrToNum(const string &s, double &r) {
 }
 
 std::pair<unsigned, unsigned> Expression::getErrorInfo() {
-    return std::make_pair(flag, mark - expre.cbegin() + tinyErrorLocation);
+    unsigned error_pos = mark - expre.cbegin() + tinyErrorLocation;
+    if (flag == INVALID_SYNTAX) {
+        if (!subfx.empty()) {
+            auto ir = std::find_if(subfx.cbegin(), subfx.cend(), [error_pos](decltype(subfx)::value_type fuck){return error_pos < fuck;});
+            auto npos = (ir - subfx.cbegin()) * fx.size();
+            if (ir != subfx.cbegin() && *(ir-1) + fx.size() + 2 >= error_pos) {
+                npos -= fx.size() + error_pos - *(ir-1);
+            }
+            error_pos = error_pos - npos;
+        }
+    }
+    return std::make_pair(flag, error_pos);
 }
-
+bool Expression::accurate() const {
+    return _accurate;
+}
+double Expression::getx() const {
+    return x;
+}
+void Expression::xzero() {
+    x = 0;
+}
+string Expression::getfx() const {
+    return fx;
+}
+void Expression::fxzero() {
+    fx = "";
+}
 double Expression::getResult() {
     if (std::abs(result) < FLT_EPSILON) {
         result = 0;
     }
     return result;
+}
+
+string Expression::to_string(short base) {
+    string s = "";
+    std::ostringstream oss(s);
+    if (base < 0 || base > 36) {
+        return oss.str();
+    }
+    else if (base == 0) {
+        oss << getResult();
+        return oss.str();
+    }
+    else if (base == 1) {
+        s = string_format("%.10lf", getResult());
+        return s;
+    }
+    else {
+        oss << convert(getResult(), base) << " (" << base << ")";
+        return oss.str();
+    }
+}
+
+string Expression::to_string(const string& base_str) {
+    string s = "";
+    std::ostringstream oss(s);
+    if (base_str.empty()) {
+        oss << getResult();
+        return oss.str();
+    }
+    int base  = atoi(base_str.c_str());
+    if (2 > base || base > 36) {
+        oss << getResult() << " (10)\n" << "  :Base Not in Range";
+        return oss.str();
+    }
+    else {
+        oss << convert(getResult(), base) << " (" << base << ")";
+        return oss.str();
+    }
 }
 
 double fac(unsigned int n) {
@@ -541,10 +608,11 @@ short get_digit(const char &c, const short &base) {
 void Expression::clear() {
     flag = CORRECT;
     tinyErrorLocation = 0;
-    accurate = false;
+    _accurate = false;
     numList.clear();
     symList.clear();
     asgn = false;
+    computed = false;
 }
 
 void Expression::init(const string &s, const bool asgn, const bool asfx) {
@@ -560,4 +628,38 @@ void Expression::init(const string &s, const bool asgn, const bool asfx) {
     this->asgn = asgn;
     this->setFunc = asfx;
     mark = sci = expre.cbegin();
+}
+
+string convert(double d, short base) {
+    string s = "";
+    if (2 > base || base > 36) return s;
+    bool posi = d >= 0;
+    d = std::abs(d);
+    do {
+        int q = static_cast<int>(d/base);
+        int r = static_cast<int>(d - q * base);
+        d += q - static_cast<int>(d);
+        char pb = r < 10 ? '0'+r : 'a'+r-10;
+        s.insert(s.begin(), pb);
+    } while (d >= 1);
+    if (std::abs(d) > __FLT_EPSILON__) {
+        // cout << "d = " << d << endl;
+        s += '.';
+    }
+    while (std::abs(d) > __FLT_EPSILON__) {
+        int q = static_cast<int>(d * base);
+        d = d * base - q;
+        char pb = q < 10 ? '0'+q : 'a'+q-10;
+        s.insert(s.end(), pb);
+    }
+    if (!posi) s.insert(s.begin(), '-');
+    return s;
+}
+
+template<typename... Args> string string_format(const string& format, Args... args) {
+    size_t size = 1 + snprintf(nullptr, 0, format.c_str(), args ...);  // Extra space for \0
+    // unique_ptr<char[]> buf(new char[size]);
+    char bytes[size];
+    snprintf(bytes, size, format.c_str(), args ...);
+    return string(bytes);
 }
