@@ -29,11 +29,13 @@ all:$(OBJS)
 	$(CC) $(CFLAGS) -o $(PROGRAM) $(OBJS)
 
 $(DEPS_DIR)/%.d: $(SRC_DIR)/%.$(EXTENSION)
+	@mkdir -p $(DEPS_DIR)
 	$(CC) $(CFLAGS) -MM $^ | sed 's,^,$@ $(OBJ_DIR)/,' > $@
 
 include $(DEPS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.$(EXTENSION)
+	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 rebuild: clean all
