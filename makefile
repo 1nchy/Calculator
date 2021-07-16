@@ -8,19 +8,16 @@ DEPS_DIR=$(DIR)/deps
 OBJ_DIR=$(DIR)/obj
 PROGRAM=$(DIR)/calculator
 
-## obj file path
-EXTENSION=cpp
-SRCS=$(wildcard $(SRC_DIR)/*.$(EXTENSION))
-OBJS=$(patsubst $(SRC_DIR)/%.$(EXTENSION), $(OBJ_DIR)/%.o, $(SRCS))
-DEPS=$(patsubst $(SRC_DIR)/%.$(EXTENSION), $(DEPS_DIR)/%.d, $(SRCS))
-
-## include file path
-INCLUDE=\
-		-I$(INCLUDE_DIR)
-
 ## compile option
 CC=g++
 CFLAGS=-std=c++11
+EXTENSION=cpp
+INCLUDE=-I$(INCLUDE_DIR)
+
+## file path
+SRCS=$(wildcard $(SRC_DIR)/*.$(EXTENSION))
+OBJS=$(patsubst $(SRC_DIR)/%.$(EXTENSION), $(OBJ_DIR)/%.o, $(SRCS))
+DEPS=$(patsubst $(SRC_DIR)/%.$(EXTENSION), $(DEPS_DIR)/%.d, $(SRCS))
 
 ## compile target
 .PHONY: all clean rebuild
@@ -30,13 +27,13 @@ all:$(OBJS)
 
 $(DEPS_DIR)/%.d: $(SRC_DIR)/%.$(EXTENSION)
 	@mkdir -p $(DEPS_DIR)
-	$(CC) $(CFLAGS) -MM $^ | sed 's,^,$@ $(OBJ_DIR)/,' > $@
+	$(CC) $(CFLAGS) $(INCLUDE) -MM $^ | sed 1's,^,$@ $(OBJ_DIR)/,' > $@
 
 include $(DEPS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.$(EXTENSION)
 	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
 
 rebuild: clean all
 
